@@ -1,7 +1,4 @@
-const isValidLengthString = (text, textLength) => {
-  const isValid = text.length <= textLength;
-  return isValid;
-};
+const isValidLengthString = (text, textLength) => text.length <= textLength;
 
 const validString = isValidLengthString('the most long word', 17);
 //console.log(validString);
