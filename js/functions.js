@@ -7,15 +7,14 @@ const validString = isValidLengthString('the most long word', 17);
 //console.log(validString);
 
 const isPalindrome = (word) => {
-  const lowerWord = word.toLowerCase();
-  console.log(lowerWord);
+  const lowerWord = word.toLowerCase().replaceAll(' ', '');
+
   let anaphrase = '';
-  console.log(anaphrase);
-  for(let i = word.length;i >= 0; i--) {
+
+  for(let i = lowerWord.length - 1; i >= 0; i--) {
     anaphrase += lowerWord[i];
   }
-  console.log(anaphrase);
   return lowerWord === anaphrase;
 };
 
-isPalindrome('Казак');
+const palindrome = isPalindrome('Лёша на полке клопа нашёл ');
