@@ -1,13 +1,4 @@
-const generateId = () => {
-  let id = 0;
-
-  return function() {
-    id++;
-    return id;
-  };
-};
-
-const messages = [
+const MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -16,7 +7,7 @@ const messages = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-const names = [
+const NAMES = [
   'Мирослава',
   'Александр',
   'Иван',
@@ -27,7 +18,7 @@ const names = [
   'Евгения',
 ];
 
-const descriptions = [
+const DESCRIPTIONS = [
   'На море!',
   'Зарядитесь нашим теплом.',
   'Просто я',
@@ -36,6 +27,15 @@ const descriptions = [
   'Работаю как босс',
   'Старые подходы не помогут открыть новые двери'
 ];
+
+const generateId = () => {
+  let id = 0;
+
+  return function() {
+    id++;
+    return id;
+  };
+};
 
 const getRandomNumberFromRange = (min, max) =>
   Math.round(min + (max - min) * Math.random());
@@ -93,19 +93,18 @@ const createPost = () => {
   const post = {
     id: postId,
     url: `photos/${generateUrl()}.jpg`,
-    description: getRandomArrayElement(descriptions),
+    description: getRandomArrayElement(DESCRIPTIONS),
     likes: getRandomNumberFromRange(15, 200),
-    createComment: function () {
-      const comment = {
+    coments: Array.from({length: getRandomNumberFromRange(0, 30)}, () => {
+      const coment = {
         id: generateCommentId(),
         avatar: `img/avatar-${getRandomNumberFromRange(1, 6)}.svg`,
-        message: Array.from({length: getRandomNumberFromRange(1, 2)}, getStringFromArray(messages)).join(' '),
-        name: getRandomArrayElement(names),
+        message: Array.from({length: getRandomNumberFromRange(1, 2)}, getStringFromArray(MESSAGES)).join(' '),
+        name: getRandomArrayElement(NAMES)
       };
-      return comment;
-    },
+      return coment;
+    })
   };
-  post.coments = Array.from({length: getRandomNumberFromRange(0, 30)}, post.createComment);
   return post;
 };
 
