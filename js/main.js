@@ -48,7 +48,7 @@ const getUnicueIdentifierFromRange = (min, max) => {
   return function() {
     let randomValue = getRandomNumberFromRange(min, max);
 
-    if(createdIdentifiers.length >= max) {
+    if(createdIdentifiers.length >= (max - min + 1)) {
       console.error(`Идентификаторы в диапазоне от ${min} до ${max} созданы`);
       return;
     }
