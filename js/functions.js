@@ -30,3 +30,30 @@ const getNumbers = (string) => {
 };
 
 console.log(getNumbers(-1));
+
+const toMinutes = (timespan) => {
+  const timeParts = timespan.split(':');
+  return (+timeParts[0]) * 60 + (+timeParts[1]);
+};
+
+const isMeetingWorkTime = (workStart, workEnd, meetingStart, duration) => {
+  const workStartMinutes = toMinutes(workStart);
+  const workEndMinutes = toMinutes(workEnd);
+  const meetingStartMinutes = toMinutes(meetingStart);
+
+  if(workStartMinutes > meetingStartMinutes) {
+    return false;
+  }
+
+  if(workEndMinutes < meetingStartMinutes + duration) {
+    return false;
+  }
+
+  return true;
+};
+
+console.log(isMeetingWorkTime('08:00', '17:30', '8:0', 90));
+console.log(isMeetingWorkTime('8:0', '10:0', '8:0', 120));
+console.log(isMeetingWorkTime('08:00', '14:30', '14:00', 90));
+console.log(isMeetingWorkTime('14:00', '17:30', '08:0', 90));
+console.log(isMeetingWorkTime('8:00', '17:30', '08:00', 900));
