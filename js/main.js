@@ -1,5 +1,5 @@
-import {getPosts} from './post.js';
+import {printPictures} from '/js/printPosts.js';
 
-const posts = getPosts(25);
+const pictures = document.querySelector('.pictures');
 
-console.log(posts);
+printPictures(pictures);
