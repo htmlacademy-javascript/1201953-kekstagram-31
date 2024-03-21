@@ -41,4 +41,6 @@ const getStringFromArray = (elements) => {
   return getElement;
 };
 
-export {generateId, getUnicueIdentifierFromRange, getStringFromArray, getRandomArrayElement, getRandomNumberFromRange};
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export {generateId, getUnicueIdentifierFromRange, getStringFromArray, getRandomArrayElement, getRandomNumberFromRange, isEscapeKey};
