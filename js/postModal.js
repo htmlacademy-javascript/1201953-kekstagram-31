@@ -16,17 +16,6 @@ const onKeydownClosePopupPost = (evt) => {
 
 const onClickClosePopupPost = () => closeModalPost();
 
-const onClickOpenPopupPost = (evt) => {
-  evt.preventDefault();
-  const post = evt.target.closest('.picture');
-  if (post) {
-    printModalPost(post);
-  }
-};
-
-pictures.addEventListener('click', onClickOpenPopupPost);
-
-
 const printModalPost = (post) => {
   const commentsFragment = document.createDocumentFragment();
 
@@ -52,6 +41,16 @@ const printModalPost = (post) => {
   popup.querySelector('.social__comment-count').classList.add('hidden');
   popup.querySelector('.comments-loader').classList.add('hidden');
 };
+
+const onClickOpenPopupPost = (evt) => {
+  evt.preventDefault();
+  const post = evt.target.closest('.picture');
+  if (post) {
+    printModalPost(post);
+  }
+};
+
+pictures.addEventListener('click', onClickOpenPopupPost);
 
 const closeModalPost = () => {
   popup.classList.add('hidden');
