@@ -31,10 +31,10 @@ const getObjectsByDomElements = () => objectsByElements;
 //     documentFragment.append(picture);
 //   });
 
-const printPictures = (elementToRenedder) => {
-  if (!(elementToRenedder instanceof Node)) {
+const printPictures = (elementToRender) => {
+  if (!(elementToRender instanceof Node)) {
     console.error('Параметр не является дом-элементом');
-    return false;
+    return;
   }
 
   posts.forEach((post) => {
@@ -49,7 +49,7 @@ const printPictures = (elementToRenedder) => {
     setObjectByDomElements(picture, post);
   });
 
-  elementToRenedder.append(documentFragment);
+  elementToRender.append(documentFragment);
 };
 
 export { printPictures, getObjectsByDomElements };
