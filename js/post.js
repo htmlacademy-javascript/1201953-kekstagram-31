@@ -21,7 +21,7 @@ const createPost = () => {
     url: `photos/${generateUrl()}.jpg`,
     description: getRandomArrayElement(descriptions),
     likes: getRandomNumberFromRange(15, 200),
-    coments: Array.from({length: getRandomNumberFromRange(0, 30)}, () => {
+    comments: Array.from({length: getRandomNumberFromRange(0, 30)}, () => {
       const coment = {
         id: generateCommentId(),
         avatar: `img/avatar-${getRandomNumberFromRange(1, 6)}.svg`,

@@ -7,24 +7,49 @@ const posts = getPosts(MAX_POST_LENGTH);
 
 const documentFragment = document.createDocumentFragment();
 
-const printPictures = (elementToRenedder) => {
-  if(!(elementToRenedder instanceof Node))
-  {
-    console.error('Параметр не является дом-элементом');
-    return false;
-  }
+const objectsByElements = new Map;
 
-  posts.forEach(({ url, description, likes, coments }) => {
-    const picture = pictureTemplate.cloneNode(true);
-    const postImage = picture.querySelector('.picture__img');
-    postImage.src = url;
-    postImage.alt = description;
-    picture.querySelector('.picture__likes').textContent = likes;
-    picture.querySelector('.picture__comments').textContent = coments.length;
-    documentFragment.append(picture);
-  });
-
-  elementToRenedder.append(documentFragment);
+const setObjectByDomElements = (element, object) => {
+  objectsByElements.set(element, object);
 };
 
-export {printPictures};
+const getObjectsByDomElements = () => objectsByElements;
+
+// const printPictures = (elementToRenedder) => {
+//   if (!(elementToRenedder instanceof Node)) {
+//     console.error('Параметр не является дом-элементом');
+//     return false;
+//   }
+
+//   posts.forEach(({ url, description, likes, coments }) => {
+//     const picture = pictureTemplate.cloneNode(true);
+//     const postImage = picture.querySelector('.picture__img');
+//     postImage.src = url;
+//     postImage.alt = description;
+//     picture.querySelector('.picture__likes').textContent = likes;
+//     picture.querySelector('.picture__comments').textContent = coments.length;
+//     documentFragment.append(picture);
+//   });
+
+const printPictures = (elementToRender) => {
+  if (!(elementToRender instanceof Node)) {
+    console.error('Параметр не является дом-элементом');
+    return;
+  }
+
+  posts.forEach((post) => {
+    const picture = pictureTemplate.cloneNode(true);
+    const postImage = picture.querySelector('.picture__img');
+    postImage.src = post.url;
+    postImage.alt = post.description;
+    picture.querySelector('.picture__likes').textContent = post.likes;
+    picture.querySelector('.picture__comments').textContent = post.comments.length;
+    documentFragment.append(picture);
+
+    setObjectByDomElements(picture, post);
+  });
+
+  elementToRender.append(documentFragment);
+};
+
+export { printPictures, getObjectsByDomElements };
