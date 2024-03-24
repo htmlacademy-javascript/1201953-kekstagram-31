@@ -8,38 +8,67 @@ const pictures = document.querySelector('.pictures');
 const popup = document.querySelector('.big-picture');
 const closeButton = popup.querySelector('#picture-cancel');
 
+const commentsBlock = popup.querySelector('.social__comments');
+
+const closeModalPost = () => {
+  popup.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+
+  document.removeEventListener('keydown', onKeydownClosePopupPost);
+};
+
 const onKeydownClosePopupPost = (evt) => {
   if (isEscapeKey(evt)) {
     closeModalPost();
   }
 };
 
-const onClickClosePopupPost = () => closeModalPost();
+closeButton.addEventListener('click', () => closeModalPost());
+
+const addCommentsToDomElement = (commentsToPrint) => {
+  commentsBlock.append(commentsToPrint);
+  popup.querySelector('.social__comment-shown-count').textContent = commentsBlock.children.length;
+};
+
+const showComments = (comments) => {
+  const commentsFragment = document.createDocumentFragment();
+  const commentsToPrint = document.createDocumentFragment();
+  comments.forEach((comment) => commentsFragment.append(createComment(comment)));
+  const commentsFragmentChilds = commentsFragment.childNodes;
+  let counter = 0;
+  for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
+    commentsToPrint.append(commentsFragmentChilds[i]);
+    counter++;
+  }
+  addCommentsToDomElement(commentsToPrint);
+  popup.querySelector('.social__comment-total-count').textContent = comments.length;
+
+  const onClickShowMoreComments = () => {
+    counter = 0;
+    for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
+      commentsToPrint.append(commentsFragmentChilds[i]);
+      counter++;
+    }
+    addCommentsToDomElement(commentsToPrint);
+  };
+
+  return onClickShowMoreComments;
+};
 
 const printModalPost = (post) => {
-  const commentsFragment = document.createDocumentFragment();
-
   const { url, description, likes, comments } = objectsByElements.get(post);
   popup.querySelector('.big-picture__img img').src = url;
   popup.querySelector('.likes-count').textContent = likes;
-  popup.querySelector('.social__comment-shown-count').textContent = comments.length;
-  popup.querySelector('.social__comment-total-count').textContent = comments.length;
-
-  comments.forEach((comment) => commentsFragment.append(createComment(comment)));
-
   popup.querySelector('.social__comments').innerHTML = '';
-  popup.querySelector('.social__comments').append(commentsFragment);
   popup.querySelector('.social__caption').textContent = description;
+
+  const onClickShowMoreComments = showComments(comments);
 
   popup.classList.remove('hidden');
   document.body.classList.add('modal-open');
 
   document.addEventListener('keydown', onKeydownClosePopupPost);
-  closeButton.addEventListener('click', onClickClosePopupPost);
-
-  //Временное скрытие элементов в попапе
-  popup.querySelector('.social__comment-count').classList.add('hidden');
-  popup.querySelector('.comments-loader').classList.add('hidden');
+  popup.querySelector('.comments-loader').addEventListener('click', onClickShowMoreComments);
 };
 
 const onClickOpenPopupPost = (evt) => {
@@ -51,11 +80,3 @@ const onClickOpenPopupPost = (evt) => {
 };
 
 pictures.addEventListener('click', onClickOpenPopupPost);
-
-const closeModalPost = () => {
-  popup.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-
-  closeButton.removeEventListener('click', onClickClosePopupPost);
-  document.removeEventListener('keydown', onKeydownClosePopupPost);
-};
