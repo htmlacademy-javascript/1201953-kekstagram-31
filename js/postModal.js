@@ -7,14 +7,43 @@ const objectsByElements = getObjectsByDomElements();
 const pictures = document.querySelector('.pictures');
 const popup = document.querySelector('.big-picture');
 const closeButton = popup.querySelector('#picture-cancel');
-
+const buttonLoadComments = popup.querySelector('.comments-loader');
 const commentsBlock = popup.querySelector('.social__comments');
+
+let commentsFragment = document.createDocumentFragment();
+const commentsToPrint = document.createDocumentFragment();
+
+const checkingComments = () => {
+  if(commentsFragment.children.length === 0) {
+    buttonLoadComments.classList.add('hidden');
+  } else {
+    buttonLoadComments.classList.remove('hidden');
+  }
+};
+
+const addCommentsToDomElement = () => {
+  commentsBlock.append(commentsToPrint);
+  popup.querySelector('.social__comment-shown-count').textContent = commentsBlock.children.length;
+  checkingComments();
+};
+
+const onClickShowMoreComments = () => {
+  let counter = 0;
+  const commentsFragmentChilds = commentsFragment.childNodes;
+  for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
+    commentsToPrint.append(commentsFragmentChilds[i]);
+    counter++;
+  }
+  addCommentsToDomElement();
+};
 
 const closeModalPost = () => {
   popup.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  commentsFragment = document.createDocumentFragment();
 
   document.removeEventListener('keydown', onKeydownClosePopupPost);
+  buttonLoadComments.removeEventListener('click', onClickShowMoreComments);
 };
 
 const onKeydownClosePopupPost = (evt) => {
@@ -25,14 +54,7 @@ const onKeydownClosePopupPost = (evt) => {
 
 closeButton.addEventListener('click', () => closeModalPost());
 
-const addCommentsToDomElement = (commentsToPrint) => {
-  commentsBlock.append(commentsToPrint);
-  popup.querySelector('.social__comment-shown-count').textContent = commentsBlock.children.length;
-};
-
 const showComments = (comments) => {
-  const commentsFragment = document.createDocumentFragment();
-  const commentsToPrint = document.createDocumentFragment();
   comments.forEach((comment) => commentsFragment.append(createComment(comment)));
   const commentsFragmentChilds = commentsFragment.childNodes;
   let counter = 0;
@@ -40,19 +62,8 @@ const showComments = (comments) => {
     commentsToPrint.append(commentsFragmentChilds[i]);
     counter++;
   }
-  addCommentsToDomElement(commentsToPrint);
+  addCommentsToDomElement();
   popup.querySelector('.social__comment-total-count').textContent = comments.length;
-
-  const onClickShowMoreComments = () => {
-    counter = 0;
-    for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
-      commentsToPrint.append(commentsFragmentChilds[i]);
-      counter++;
-    }
-    addCommentsToDomElement(commentsToPrint);
-  };
-
-  return onClickShowMoreComments;
 };
 
 const printModalPost = (post) => {
@@ -61,14 +72,13 @@ const printModalPost = (post) => {
   popup.querySelector('.likes-count').textContent = likes;
   popup.querySelector('.social__comments').innerHTML = '';
   popup.querySelector('.social__caption').textContent = description;
-
-  const onClickShowMoreComments = showComments(comments);
+  showComments(comments);
 
   popup.classList.remove('hidden');
   document.body.classList.add('modal-open');
 
   document.addEventListener('keydown', onKeydownClosePopupPost);
-  popup.querySelector('.comments-loader').addEventListener('click', onClickShowMoreComments);
+  buttonLoadComments.addEventListener('click', onClickShowMoreComments);
 };
 
 const onClickOpenPopupPost = (evt) => {
