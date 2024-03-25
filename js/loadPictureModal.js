@@ -83,7 +83,7 @@ const errorHashtags = () => {
   });
 
   if(invalidHashtags !== 0) {
-    return `введены невалидные хэштеги: ${invalidHashtags.join(', ')}`;
+    return invalidHashtags.length > 1 ? `введены невалидные хэштеги: ${invalidHashtags.join(', ')}` : `введен невалидный хэштег: ${invalidHashtags.join()}`;
   }
 };
 
