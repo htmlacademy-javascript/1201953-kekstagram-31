@@ -22,18 +22,18 @@ const checkingComments = () => {
 };
 
 const addCommentsToDomElement = () => {
+  const commentsFragmentChilds = commentsFragment.childNodes;
+  let counter = 0;
+  for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
+    commentsToPrint.append(commentsFragmentChilds[i]);
+    counter++;
+  }
   commentsBlock.append(commentsToPrint);
   popup.querySelector('.social__comment-shown-count').textContent = commentsBlock.children.length;
   checkingComments();
 };
 
 const onClickShowMoreComments = () => {
-  let counter = 0;
-  const commentsFragmentChilds = commentsFragment.childNodes;
-  for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
-    commentsToPrint.append(commentsFragmentChilds[i]);
-    counter++;
-  }
   addCommentsToDomElement();
 };
 
@@ -56,12 +56,6 @@ closeButton.addEventListener('click', () => closeModalPost());
 
 const showComments = (comments) => {
   comments.forEach((comment) => commentsFragment.append(createComment(comment)));
-  const commentsFragmentChilds = commentsFragment.childNodes;
-  let counter = 0;
-  for(let i = commentsFragmentChilds.length - 1; i >= 0 && counter < 5; i--) {
-    commentsToPrint.append(commentsFragmentChilds[i]);
-    counter++;
-  }
   addCommentsToDomElement();
   popup.querySelector('.social__comment-total-count').textContent = comments.length;
 };
