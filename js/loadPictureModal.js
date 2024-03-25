@@ -67,11 +67,23 @@ const errorHashtags = () => {
   if (hashtags.length > 5) {
     return 'превышено количество хэштегов';
   }
-  if (!hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
-    return 'введён невалидный хэштег';
-  }
+  // if (!hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
+  //   return 'введён невалидный хэштег';
+  // }
   if (duplicates.length > 0) {
     return 'хэштеги повторяются';
+  }
+  const invalidHashtags = [];
+  let invalidHashtagCounter = 0;
+  hashtags.forEach((hashtag) => {
+    if(!hashtagRegex.test(hashtag)) {
+      invalidHashtags[invalidHashtagCounter] = hashtag;
+      invalidHashtagCounter++;
+    }
+  });
+
+  if(invalidHashtags !== 0) {
+    return `введены невалидные хэштеги: ${invalidHashtags.join(', ')}`;
   }
 };
 
