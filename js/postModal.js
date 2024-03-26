@@ -41,18 +41,22 @@ const closeModalPost = () => {
   popup.classList.add('hidden');
   document.body.classList.remove('modal-open');
   commentsFragment = document.createDocumentFragment();
-
-  document.removeEventListener('keydown', onKeydownClosePopupPost);
-  buttonLoadComments.removeEventListener('click', onClickShowMoreComments);
 };
 
 const onKeydownClosePopupPost = (evt) => {
   if (isEscapeKey(evt)) {
     closeModalPost();
+
+    document.removeEventListener('keydown', onKeydownClosePopupPost);
+    buttonLoadComments.removeEventListener('click', onClickShowMoreComments);
   }
 };
 
-closeButton.addEventListener('click', () => closeModalPost());
+closeButton.addEventListener('click', () => {
+  closeModalPost();
+  document.removeEventListener('keydown', onKeydownClosePopupPost);
+  buttonLoadComments.removeEventListener('click', onClickShowMoreComments);
+});
 
 const showComments = (comments) => {
   comments.forEach((comment) => commentsFragment.append(createComment(comment)));
@@ -76,9 +80,9 @@ const printModalPost = (post) => {
 };
 
 const onClickOpenPopupPost = (evt) => {
-  evt.preventDefault();
   const post = evt.target.closest('.picture');
   if (post) {
+    evt.preventDefault();
     printModalPost(post);
   }
 };
