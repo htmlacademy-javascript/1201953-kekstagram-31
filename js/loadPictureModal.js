@@ -13,6 +13,9 @@ const submitButton = modalEditPicture.querySelector('#upload-submit');
 let hashtags;
 let duplicates;
 
+const MAX_COMMENT_LENGTH = 140;
+const MAX_COUNT_HASHTAGS = 5;
+
 const pristine = new Pristine(formLoadPicture, {
   classTo: 'img-upload__field-wrapper',
   errorClass: 'img-upload__field-wrapper--error',
@@ -23,10 +26,10 @@ const pristine = new Pristine(formLoadPicture, {
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  hashtags = [];
+  duplicates = [];
 
-  buttonLoad.value = '';
-  textHashtags.value = '';
-  textComment.value = '';
+  formLoadPicture.reset();
   pristine.reset();
 };
 
@@ -57,14 +60,14 @@ const validateHashtags = (value) => {
   hashtags = value.toLowerCase().split(' ');
   hashtags = hashtags.filter((element) => element !== '');
   duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
-  if (duplicates.length === 0 && hashtags.length <= 5 && hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
+  if (duplicates.length === 0 && hashtags.length <= MAX_COUNT_HASHTAGS && hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
     return true;
   }
   return false;
 };
 
 const errorHashtags = () => {
-  if (hashtags.length > 5) {
+  if (hashtags.length > MAX_COUNT_HASHTAGS) {
     return 'превышено количество хэштегов';
   }
   // if (!hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
@@ -74,11 +77,9 @@ const errorHashtags = () => {
     return 'хэштеги повторяются';
   }
   const invalidHashtags = [];
-  let invalidHashtagCounter = 0;
   hashtags.forEach((hashtag) => {
     if(!hashtagRegex.test(hashtag)) {
-      invalidHashtags[invalidHashtagCounter] = hashtag;
-      invalidHashtagCounter++;
+      invalidHashtags.push(hashtag);
     }
   });
 
@@ -87,7 +88,7 @@ const errorHashtags = () => {
   }
 };
 
-const validateComment = (value) => value.length <= 140;
+const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
 
 pristine.addValidator(textHashtags, validateHashtags, errorHashtags);
 pristine.addValidator(textComment, validateComment, 'длина комментария больше 140 символов');
@@ -102,11 +103,10 @@ formLoadPicture.addEventListener('submit', (evt) => {
   }
 });
 
-// textHashtags.addEventListener('focus', () => {
-//   document.removeEventListener('keydown', onKeydownCloseModal);
-// });
-
-
 textHashtags.addEventListener('keydown', (evt) => {
+  evt.stopPropagation();
+});
+
+textComment.addEventListener('keydown', (evt) => {
   evt.stopPropagation();
 });
