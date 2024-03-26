@@ -10,9 +10,6 @@ const textHashtags = modalEditPicture.querySelector('.text__hashtags');
 const textComment = modalEditPicture.querySelector('.text__description');
 const submitButton = modalEditPicture.querySelector('#upload-submit');
 
-let hashtags;
-let duplicates;
-
 const MAX_COMMENT_LENGTH = 140;
 const MAX_COUNT_HASHTAGS = 5;
 
@@ -21,13 +18,12 @@ const pristine = new Pristine(formLoadPicture, {
   errorClass: 'img-upload__field-wrapper--error',
   errorTextParent: 'img-upload__field-wrapper',
   errorTextTag: 'div',
-});
+},
+false);
 
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
-  hashtags = [];
-  duplicates = [];
 
   formLoadPicture.reset();
   pristine.reset();
@@ -57,16 +53,20 @@ closeFormButton.addEventListener('click', () => {
 });
 
 const validateHashtags = (value) => {
-  hashtags = value.toLowerCase().split(' ');
+  let hashtags = value.toLowerCase().split(' ');
   hashtags = hashtags.filter((element) => element !== '');
-  duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
-  if (duplicates.length === 0 && hashtags.length <= MAX_COUNT_HASHTAGS && hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
+  const duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
+  const validHashtags = hashtags.every((hashtag) => hashtagRegex.exec(hashtag) ? hashtagRegex.exec(hashtag)[0] === hashtag : false);
+  if (duplicates.length === 0 && hashtags.length <= MAX_COUNT_HASHTAGS && validHashtags) {
     return true;
   }
   return false;
 };
 
 const errorHashtags = () => {
+  let hashtags = textHashtags.value.toLowerCase().split(' ');
+  hashtags = hashtags.filter((element) => element !== '');
+  const duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
   if (hashtags.length > MAX_COUNT_HASHTAGS) {
     return 'превышено количество хэштегов';
   }
@@ -78,7 +78,7 @@ const errorHashtags = () => {
   }
   const invalidHashtags = [];
   hashtags.forEach((hashtag) => {
-    if(!hashtagRegex.test(hashtag)) {
+    if(hashtagRegex.exec(hashtag) ? hashtagRegex.exec(hashtag)[0] !== hashtag : true) {
       invalidHashtags.push(hashtag);
     }
   });
