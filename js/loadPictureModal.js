@@ -1,6 +1,6 @@
 import { isEscapeKey } from '/js/utility.js';
 import { validateInicial } from '/js/validateUploadImageForm.js';
-import { scaleImage } from '/js/editPictureModal.js';
+import { scaleImage, editPicture } from '/js/editPictureModal.js';
 
 const formLoadPicture = document.querySelector('#upload-select-image');
 const buttonLoad = formLoadPicture.querySelector('#upload-file');
@@ -13,6 +13,12 @@ const submitButton = modalEditPicture.querySelector('#upload-submit');
 // const buttonScaleMore = modalEditPicture.querySelector('.scale__control--bigger');
 const scaleText = modalEditPicture.querySelector('.scale__control--value');
 const uploadImagePreview = modalEditPicture.querySelector('.img-upload__preview');
+const range = modalEditPicture.querySelector('.effect-level__slider');
+const effectsList = modalEditPicture.querySelector('.effects__list');
+const uploadImage = modalEditPicture.querySelector('.img-upload__preview');
+const sliderContainer = modalEditPicture.querySelector('.img-upload__effect-level');
+const originalEffect = effectsList.querySelector('#effect-none');
+const effectLevel = modalEditPicture.querySelector('.effect-level__value');
 
 const imageUploadScale = modalEditPicture.querySelector('.img-upload__scale');
 
@@ -23,16 +29,20 @@ imageUploadScale.addEventListener('click', scaleImageChange);
 // buttonScaleLess.addEventListener('click', scaleImageLess);
 // buttonScaleMore.addEventListener('click', scaleImageMore);
 
-const validateForm = validateInicial(formLoadPicture, textHashtags, textComment);
+const onChangeSelectEffect = editPicture(range, uploadImage, sliderContainer, effectLevel);
 let pristine;
 
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
   uploadImagePreview.style.transform = `scale(${1})`;
+  originalEffect.setAttribute('checked', 'checked');
+  uploadImage.style.filter = '';
 
   formLoadPicture.reset();
   pristine.destroy();
+
+  effectsList.removeEventListener('change', onChangeSelectEffect);
 };
 
 const onKeydownCloseModal = (evt) => {
@@ -43,11 +53,14 @@ const onKeydownCloseModal = (evt) => {
 };
 
 const openModal = () => {
+  const validateForm = validateInicial(formLoadPicture, textHashtags, textComment);
   modalEditPicture.classList.remove('hidden');
   document.body.classList.add('modal-open');
   pristine = validateForm();
+  sliderContainer.classList.add('hidden');
 
   document.addEventListener('keydown', onKeydownCloseModal);
+  effectsList.addEventListener('change', onChangeSelectEffect);
 };
 
 buttonLoad.addEventListener('change', () => {
