@@ -1,6 +1,6 @@
 import { isEscapeKey } from '/js/utility.js';
-
-const hashtagRegex = /^#[a-zа-яё0-9]{1,19}/i;
+import { validateInicial } from '/js/validateUploadImageForm.js';
+import { scaleImage } from '/js/editPictureModal.js';
 
 const formLoadPicture = document.querySelector('#upload-select-image');
 const buttonLoad = formLoadPicture.querySelector('#upload-file');
@@ -9,24 +9,30 @@ const closeFormButton = modalEditPicture.querySelector('#upload-cancel');
 const textHashtags = modalEditPicture.querySelector('.text__hashtags');
 const textComment = modalEditPicture.querySelector('.text__description');
 const submitButton = modalEditPicture.querySelector('#upload-submit');
+// const buttonScaleLess = modalEditPicture.querySelector('.scale__control--smaller');
+// const buttonScaleMore = modalEditPicture.querySelector('.scale__control--bigger');
+const scaleText = modalEditPicture.querySelector('.scale__control--value');
+const uploadImagePreview = modalEditPicture.querySelector('.img-upload__preview');
 
-const MAX_COMMENT_LENGTH = 140;
-const MAX_COUNT_HASHTAGS = 5;
+const imageUploadScale = modalEditPicture.querySelector('.img-upload__scale');
 
-const pristine = new Pristine(formLoadPicture, {
-  classTo: 'img-upload__field-wrapper',
-  errorClass: 'img-upload__field-wrapper--error',
-  errorTextParent: 'img-upload__field-wrapper',
-  errorTextTag: 'div',
-},
-false);
+const scaleImageChange = scaleImage(scaleText, uploadImagePreview);
+
+imageUploadScale.addEventListener('click', scaleImageChange);
+
+// buttonScaleLess.addEventListener('click', scaleImageLess);
+// buttonScaleMore.addEventListener('click', scaleImageMore);
+
+const validateForm = validateInicial(formLoadPicture, textHashtags, textComment);
+let pristine;
 
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  uploadImagePreview.style.transform = `scale(${1})`;
 
   formLoadPicture.reset();
-  pristine.reset();
+  pristine.destroy();
 };
 
 const onKeydownCloseModal = (evt) => {
@@ -39,6 +45,7 @@ const onKeydownCloseModal = (evt) => {
 const openModal = () => {
   modalEditPicture.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  pristine = validateForm();
 
   document.addEventListener('keydown', onKeydownCloseModal);
 };
@@ -51,47 +58,6 @@ closeFormButton.addEventListener('click', () => {
   closeModal();
   document.removeEventListener('keydown', onKeydownCloseModal);
 });
-
-const validateHashtags = (value) => {
-  let hashtags = value.toLowerCase().split(' ');
-  hashtags = hashtags.filter((element) => element !== '');
-  const duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
-  const validHashtags = hashtags.every((hashtag) => hashtagRegex.exec(hashtag) ? hashtagRegex.exec(hashtag)[0] === hashtag : false);
-  if (duplicates.length === 0 && hashtags.length <= MAX_COUNT_HASHTAGS && validHashtags) {
-    return true;
-  }
-  return false;
-};
-
-const errorHashtags = () => {
-  let hashtags = textHashtags.value.toLowerCase().split(' ');
-  hashtags = hashtags.filter((element) => element !== '');
-  const duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
-  if (hashtags.length > MAX_COUNT_HASHTAGS) {
-    return 'превышено количество хэштегов';
-  }
-  // if (!hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
-  //   return 'введён невалидный хэштег';
-  // }
-  if (duplicates.length > 0) {
-    return 'хэштеги повторяются';
-  }
-  const invalidHashtags = [];
-  hashtags.forEach((hashtag) => {
-    if(hashtagRegex.exec(hashtag) ? hashtagRegex.exec(hashtag)[0] !== hashtag : true) {
-      invalidHashtags.push(hashtag);
-    }
-  });
-
-  if(invalidHashtags !== 0) {
-    return invalidHashtags.length > 1 ? `введены невалидные хэштеги: ${invalidHashtags.join(', ')}` : `введен невалидный хэштег: ${invalidHashtags.join()}`;
-  }
-};
-
-const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
-
-pristine.addValidator(textHashtags, validateHashtags, errorHashtags);
-pristine.addValidator(textComment, validateComment, 'длина комментария больше 140 символов');
 
 formLoadPicture.addEventListener('submit', (evt) => {
   evt.preventDefault();
