@@ -1,6 +1,7 @@
 import { isEscapeKey } from '/js/utility.js';
 import { validateInicial } from '/js/validateUploadImageForm.js';
 import { scaleImage, editPicture } from '/js/editPictureModal.js';
+import { resetFilter } from './slider.js';
 
 const formLoadPicture = document.querySelector('#upload-select-image');
 const buttonLoad = formLoadPicture.querySelector('#upload-file');
@@ -9,8 +10,6 @@ const closeFormButton = modalEditPicture.querySelector('#upload-cancel');
 const textHashtags = modalEditPicture.querySelector('.text__hashtags');
 const textComment = modalEditPicture.querySelector('.text__description');
 const submitButton = modalEditPicture.querySelector('#upload-submit');
-// const buttonScaleLess = modalEditPicture.querySelector('.scale__control--smaller');
-// const buttonScaleMore = modalEditPicture.querySelector('.scale__control--bigger');
 const scaleText = modalEditPicture.querySelector('.scale__control--value');
 const uploadImagePreview = modalEditPicture.querySelector('.img-upload__preview');
 const range = modalEditPicture.querySelector('.effect-level__slider');
@@ -26,18 +25,13 @@ const scaleImageChange = scaleImage(scaleText, uploadImagePreview);
 
 imageUploadScale.addEventListener('click', scaleImageChange);
 
-// buttonScaleLess.addEventListener('click', scaleImageLess);
-// buttonScaleMore.addEventListener('click', scaleImageMore);
-
 const onChangeSelectEffect = editPicture(range, uploadImage, sliderContainer, effectLevel);
 let pristine;
 
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
-  uploadImagePreview.style.transform = `scale(${1})`;
-  originalEffect.setAttribute('checked', 'checked');
-  uploadImage.style.filter = '';
+  resetFilter(uploadImagePreview, originalEffect, uploadImage);
 
   formLoadPicture.reset();
   pristine.destroy();

@@ -24,4 +24,10 @@ const updateSliderRange = (sliderElement, minRange, maxRange, step, start) => {
   });
 };
 
-export { generateSlider, updateSliderRange };
+const resetFilter = (uploadImagePreviewElement, originalEffectElement, uploadImageElement) => {
+  uploadImagePreviewElement.style.transform = `scale(${1})`;
+  originalEffectElement.setAttribute('checked', 'checked');
+  uploadImageElement.style.filter = '';
+};
+
+export { generateSlider, updateSliderRange, resetFilter };
