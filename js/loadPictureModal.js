@@ -11,17 +11,16 @@ const textHashtags = modalEditPicture.querySelector('.text__hashtags');
 const textComment = modalEditPicture.querySelector('.text__description');
 const submitButton = modalEditPicture.querySelector('#upload-submit');
 const scaleText = modalEditPicture.querySelector('.scale__control--value');
-const uploadImagePreview = modalEditPicture.querySelector('.img-upload__preview');
 const range = modalEditPicture.querySelector('.effect-level__slider');
 const effectsList = modalEditPicture.querySelector('.effects__list');
-const uploadImage = modalEditPicture.querySelector('.img-upload__preview');
+const uploadImage = modalEditPicture.querySelector('.img-upload__preview img');
 const sliderContainer = modalEditPicture.querySelector('.img-upload__effect-level');
 const originalEffect = effectsList.querySelector('#effect-none');
 const effectLevel = modalEditPicture.querySelector('.effect-level__value');
 
 const imageUploadScale = modalEditPicture.querySelector('.img-upload__scale');
 
-const scaleImageChange = scaleImage(scaleText, uploadImagePreview);
+const scaleImageChange = scaleImage(scaleText, uploadImage);
 
 imageUploadScale.addEventListener('click', scaleImageChange);
 
@@ -31,7 +30,7 @@ let pristine;
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
-  resetFilter(uploadImagePreview, originalEffect, uploadImage);
+  resetFilter(uploadImage, originalEffect, uploadImage);
 
   formLoadPicture.reset();
   pristine.destroy();
@@ -73,6 +72,7 @@ formLoadPicture.addEventListener('submit', (evt) => {
   if (isValid) {
     formLoadPicture.submit();
     submitButton.setAttribute('disabled', 'disabled');
+    pristine.destroy();
   }
 });
 
