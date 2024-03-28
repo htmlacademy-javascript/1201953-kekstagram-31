@@ -5,7 +5,11 @@ const generateSlider = (range) => {
       'max': 1
     },
     step: 0.1,
-    start: 1
+    start: 1,
+    format: {
+      to: (value) => value,
+      from: (value) => parseFloat(value)
+    }
   });
 };
 
