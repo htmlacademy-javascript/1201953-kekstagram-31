@@ -1,6 +1,7 @@
 import { isEscapeKey } from '/js/utility.js';
-
-const hashtagRegex = /^#[a-zа-яё0-9]{1,19}/i;
+import { validateInicial } from '/js/validateUploadImageForm.js';
+import { scaleImage, editPicture } from '/js/editPictureModal.js';
+import { resetFilter } from './slider.js';
 
 const formLoadPicture = document.querySelector('#upload-select-image');
 const buttonLoad = formLoadPicture.querySelector('#upload-file');
@@ -9,24 +10,32 @@ const closeFormButton = modalEditPicture.querySelector('#upload-cancel');
 const textHashtags = modalEditPicture.querySelector('.text__hashtags');
 const textComment = modalEditPicture.querySelector('.text__description');
 const submitButton = modalEditPicture.querySelector('#upload-submit');
+const scaleText = modalEditPicture.querySelector('.scale__control--value');
+const range = modalEditPicture.querySelector('.effect-level__slider');
+const effectsList = modalEditPicture.querySelector('.effects__list');
+const uploadImage = modalEditPicture.querySelector('.img-upload__preview img');
+const sliderContainer = modalEditPicture.querySelector('.img-upload__effect-level');
+const originalEffect = effectsList.querySelector('#effect-none');
+const effectLevel = modalEditPicture.querySelector('.effect-level__value');
 
-const MAX_COMMENT_LENGTH = 140;
-const MAX_COUNT_HASHTAGS = 5;
+const imageUploadScale = modalEditPicture.querySelector('.img-upload__scale');
 
-const pristine = new Pristine(formLoadPicture, {
-  classTo: 'img-upload__field-wrapper',
-  errorClass: 'img-upload__field-wrapper--error',
-  errorTextParent: 'img-upload__field-wrapper',
-  errorTextTag: 'div',
-},
-false);
+const scaleImageChange = scaleImage(scaleText, uploadImage);
+
+imageUploadScale.addEventListener('click', scaleImageChange);
+
+const onChangeSelectEffect = editPicture(range, uploadImage, sliderContainer, effectLevel);
+let pristine;
 
 const closeModal = () => {
   modalEditPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  resetFilter(uploadImage, originalEffect, uploadImage);
 
   formLoadPicture.reset();
-  pristine.reset();
+  pristine.destroy();
+
+  effectsList.removeEventListener('change', onChangeSelectEffect);
 };
 
 const onKeydownCloseModal = (evt) => {
@@ -37,10 +46,14 @@ const onKeydownCloseModal = (evt) => {
 };
 
 const openModal = () => {
+  const validateForm = validateInicial(formLoadPicture, textHashtags, textComment);
   modalEditPicture.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  pristine = validateForm();
+  sliderContainer.classList.add('hidden');
 
   document.addEventListener('keydown', onKeydownCloseModal);
+  effectsList.addEventListener('change', onChangeSelectEffect);
 };
 
 buttonLoad.addEventListener('change', () => {
@@ -52,47 +65,6 @@ closeFormButton.addEventListener('click', () => {
   document.removeEventListener('keydown', onKeydownCloseModal);
 });
 
-const validateHashtags = (value) => {
-  let hashtags = value.toLowerCase().split(' ');
-  hashtags = hashtags.filter((element) => element !== '');
-  const duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
-  const validHashtags = hashtags.every((hashtag) => hashtagRegex.exec(hashtag) ? hashtagRegex.exec(hashtag)[0] === hashtag : false);
-  if (duplicates.length === 0 && hashtags.length <= MAX_COUNT_HASHTAGS && validHashtags) {
-    return true;
-  }
-  return false;
-};
-
-const errorHashtags = () => {
-  let hashtags = textHashtags.value.toLowerCase().split(' ');
-  hashtags = hashtags.filter((element) => element !== '');
-  const duplicates = hashtags.filter((element, indexCurrentElement, hashtagsArray) => hashtagsArray.indexOf(element) !== indexCurrentElement);
-  if (hashtags.length > MAX_COUNT_HASHTAGS) {
-    return 'превышено количество хэштегов';
-  }
-  // if (!hashtags.every((hashtag) => hashtagRegex.test(hashtag))) {
-  //   return 'введён невалидный хэштег';
-  // }
-  if (duplicates.length > 0) {
-    return 'хэштеги повторяются';
-  }
-  const invalidHashtags = [];
-  hashtags.forEach((hashtag) => {
-    if(hashtagRegex.exec(hashtag) ? hashtagRegex.exec(hashtag)[0] !== hashtag : true) {
-      invalidHashtags.push(hashtag);
-    }
-  });
-
-  if(invalidHashtags !== 0) {
-    return invalidHashtags.length > 1 ? `введены невалидные хэштеги: ${invalidHashtags.join(', ')}` : `введен невалидный хэштег: ${invalidHashtags.join()}`;
-  }
-};
-
-const validateComment = (value) => value.length <= MAX_COMMENT_LENGTH;
-
-pristine.addValidator(textHashtags, validateHashtags, errorHashtags);
-pristine.addValidator(textComment, validateComment, 'длина комментария больше 140 символов');
-
 formLoadPicture.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
@@ -100,6 +72,7 @@ formLoadPicture.addEventListener('submit', (evt) => {
   if (isValid) {
     formLoadPicture.submit();
     submitButton.setAttribute('disabled', 'disabled');
+    pristine.destroy();
   }
 });
 
